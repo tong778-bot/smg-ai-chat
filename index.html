@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SMG Glass AI Assistant | ผู้ช่วยงานกระจก SMG</title>
+  <meta name="description" content="ผู้ช่วย AI สำหรับปรึกษาเรื่องกระจกเทมเปอร์ กระจกลามิเนต กระจกอินซูเลท ขอใบเสนอราคา และปรึกษาโครงการ โดย SMG Glass and Metal" />
+  <meta name="theme-color" content="#003e52" />
+  <link rel="icon" href="./logo_3_deepblue.png" type="image/png" />
+  <meta property="og:title" content="SMG Glass AI Assistant" />
+  <meta property="og:description" content="ผู้ช่วยงานกระจก SMG สำหรับให้ข้อมูลเบื้องต้นและเตรียมข้อมูลขอใบเสนอราคา" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tong778-bot.github.io/smg-ai-chat/" />
+  <meta property="og:image" content="./logo_3_deepblue.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            smgBlue: '#003e52', smgBlue2: '#074a5f',
+            smgGreen: '#6fa088', smgBlack: '#231f20',
+            smgMint: '#eaf4ef', smgPale: '#f5faf8'
+          },
+          fontFamily: {
+            kanit: ['Kanit','sans-serif'],
+            prompt: ['Prompt','sans-serif'],
+            montserrat: ['Montserrat','sans-serif']
+          },
+          boxShadow: {
+            smg: '0 24px 80px rgba(0,62,82,0.16)',
+            card: '0 16px 40px rgba(0,62,82,0.10)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Prompt', sans-serif; color: #231f20;
+      background:
+        radial-gradient(circle at 8% 12%, rgba(111,160,136,0.18), transparent 28%),
+        radial-gradient(circle at 90% 10%, rgba(0,62,82,0.08), transparent 24%),
+        linear-gradient(135deg, #ffffff 0%, #f4faf7 48%, #eef6f8 100%);
+    }
+    .smg-grid {
+      background-image:
+        linear-gradient(rgba(0,62,82,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,62,82,0.035) 1px, transparent 1px);
+      background-size: 34px 34px;
+    }
+    .brand-gradient { background: linear-gradient(135deg, #003e52 0%, #074a5f 48%, #6fa088 100%); }
+    .hero-surface {
+      background: radial-gradient(circle at top left, rgba(111,160,136,0.18), transparent 28%),
+        linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(245,250,248,0.94) 100%);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    }
+
+    /* ── Glass visual panels (CSS-only, no external images needed) ── */
+    .glass-hero-visual {
+      position: relative; overflow: hidden; min-height: 260px;
+      background: linear-gradient(145deg, #003e52 0%, #074a5f 40%, #0a5c74 70%, #6fa088 100%);
+    }
+    .glass-hero-visual::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          transparent, transparent 59px,
+          rgba(255,255,255,0.06) 59px, rgba(255,255,255,0.06) 60px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent, transparent 59px,
+          rgba(255,255,255,0.06) 59px, rgba(255,255,255,0.06) 60px
+        );
+    }
+    .glass-hero-visual::after {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(111,160,136,0.35) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(255,255,255,0.12) 0%, transparent 45%),
+        radial-gradient(ellipse at 60% 20%, rgba(10,92,116,0.5) 0%, transparent 40%);
+    }
+    /* Simulated glass panel reflections */
+    .glass-pane {
+      position: absolute; border: 1px solid rgba(255,255,255,0.15);
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+      backdrop-filter: blur(2px);
+    }
+    .glass-hero-content {
+      position: relative; z-index: 2;
+      padding: 2rem 2.5rem; height: 100%;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+
+    /* Photo strip fallback panels */
+    .photo-strip-1 {
+      background: linear-gradient(135deg, #003e52 0%, #1a6b7a 50%, #6fa088 100%);
+    }
+    .photo-strip-2 {
+      background: linear-gradient(135deg, #074a5f 0%, #003e52 60%, #0d4a3c 100%);
+    }
+    .photo-strip-3 {
+      background: linear-gradient(135deg, #0a5c74 0%, #074a5f 50%, #231f20 100%);
+    }
+    .photo-grid-overlay {
+      position: absolute; inset: 0;
+      background:
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.05) 39px, rgba(255,255,255,0.05) 40px),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.05) 39px, rgba(255,255,255,0.05) 40px);
+    }
+
+    /* Service card image fallback */
+    .svc-img-1 { background: linear-gradient(135deg, #003e52, #6fa088); }
+    .svc-img-2 { background: linear-gradient(135deg, #1a6b7a, #003e52); }
+    .svc-img-3 { background: linear-gradient(135deg, #074a5f, #0d4a3c); }
+    .svc-img-fallback {
+      width: 100%; height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; position: relative; overflow: hidden;
+    }
+    .svc-img-fallback::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 14px, rgba(255,255,255,0.04) 14px, rgba(255,255,255,0.04) 15px);
+    }
+
+    /* img with fallback */
+    img.has-fallback { transition: opacity 0.3s; }
+
+    .mini-card:hover, .question-card:hover { transform: translateY(-3px); }
+
+    .eco-bar { background: rgba(0,62,82,0.04); border-bottom: 1px solid rgba(0,62,82,0.10); }
+    .eco-link {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.45rem 0.85rem; border-radius: 9999px;
+      font-size: 0.78rem; font-weight: 600; color: #003e52;
+      transition: background 0.15s, color 0.15s; white-space: nowrap;
+    }
+    .eco-link:hover { background: #eaf4ef; }
+    .eco-link.active { background: #003e52; color: #fff; }
+    .eco-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.55; }
+    .float-line { background: #06C755; }
+    .float-line:hover { background: #003e52; }
+  </style>
+</head>
+<body class="smg-grid">
+
+<div class="h-1 brand-gradient"></div>
+
+<!-- Ecosystem Bar -->
+<div class="eco-bar overflow-x-auto">
+  <div class="mx-auto flex max-w-7xl items-center gap-1 px-4 py-2 sm:px-8 sm:gap-2">
+    <span class="font-montserrat text-[0.65rem] font-bold uppercase tracking-widest text-smgBlue/40 mr-1 shrink-0">SMG TOOLS</span>
+    <a href="https://tong778-bot.github.io/smg-ai-chat/" class="eco-link active shrink-0"><span class="eco-dot"></span>AI Chat</a>
+    <a href="https://tong778-bot.github.io/smg-tools/" target="_blank" rel="noopener" class="eco-link shrink-0"><span class="eco-dot"></span>Glass Calculator</a>
+    <a href="https://tong778-bot.github.io/smg-glass-pool/index.html" target="_blank" rel="noopener" class="eco-link shrink-0"><span class="eco-dot"></span>Glass Pool Series</a>
+    <a href="https://tong778-bot.github.io/smg-fairjoint/efiling-guide.html" target="_blank" rel="noopener" class="eco-link shrink-0"><span class="eco-dot"></span>FairJoint</a>
+    <div class="ml-auto shrink-0">
+      <a href="https://www.smg-con.co.th/" target="_blank" rel="noopener" class="eco-link text-smgGreen">smg-con.co.th ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/88 backdrop-blur-xl">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
+    <a href="https://www.smg-con.co.th/index.php" class="flex items-center gap-4" aria-label="SMG Glass and Metal">
+      <img src="./logo_3_deepblue.png" alt="SMG Glass and Metal" class="h-12 w-auto object-contain sm:h-14" loading="lazy" />
+    </a>
+    <nav class="hidden items-center gap-3 md:flex">
+      <a href="https://www.smg-con.co.th/index.php" target="_blank" rel="noopener" class="rounded-full px-4 py-2 text-sm font-medium text-smgBlue hover:bg-smgMint transition">เว็บไซต์หลัก</a>
+      <a href="https://www.smg-con.co.th/esg_center.php" target="_blank" rel="noopener" class="rounded-full px-4 py-2 text-sm font-medium text-smgBlue hover:bg-smgMint transition">ESG CENTER</a>
+      <a href="tel:0863174966" class="rounded-full border border-smgBlue/20 bg-white px-4 py-2 text-sm font-semibold text-smgBlue hover:bg-smgBlue hover:text-white transition">โทร 086-317-4966</a>
+      <a href="https://line.me/R/ti/p/@smg58" target="_blank" rel="noopener" class="rounded-full bg-smgGreen px-4 py-2 text-sm font-semibold text-white hover:bg-smgBlue transition">LINE @smg58</a>
+    </nav>
+    <div class="flex items-center gap-2 md:hidden">
+      <a href="https://www.smg-con.co.th/index.php" target="_blank" rel="noopener" class="rounded-full px-3 py-2 text-xs font-medium text-smgBlue hover:bg-smgMint transition">เว็บหลัก</a>
+      <a href="https://line.me/R/ti/p/@smg58" target="_blank" rel="noopener" class="rounded-full bg-smgGreen px-4 py-2 text-sm font-semibold text-white">LINE</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Hero -->
+  <section class="mx-auto max-w-7xl px-4 py-8 sm:px-8 lg:py-12">
+    <div class="hero-surface overflow-hidden rounded-[2rem] border border-white shadow-smg">
+      <div class="grid lg:grid-cols-[1.05fr_0.95fr]">
+
+        <!-- Left: Text -->
+        <div class="flex flex-col justify-center p-7 sm:p-10 lg:p-14">
+          <div class="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-smgGreen/35 bg-smgMint px-4 py-2">
+            <span class="h-2.5 w-2.5 animate-pulse rounded-full bg-smgGreen"></span>
+            <span class="font-montserrat text-xs font-bold uppercase tracking-[0.18em] text-smgBlue">AI Assistant for Glass Consultation</span>
+          </div>
+          <p class="mb-3 font-montserrat text-xs font-bold uppercase tracking-[0.26em] text-smgGreen">SMG Glass And Metal Co., Ltd.</p>
+          <h1 class="mb-5 font-kanit text-4xl font-extrabold leading-[1.05] text-smgBlue sm:text-5xl lg:text-6xl">
+            ผู้ช่วยงานกระจก<br />SMG Glass AI
+          </h1>
+          <p class="mb-8 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+            ปรึกษาข้อมูลเบื้องต้นเกี่ยวกับกระจกเทมเปอร์ กระจกลามิเนต กระจกอินซูเลท งานติดตั้ง และการเตรียมข้อมูลสำหรับขอใบเสนอราคา
+          </p>
+          <div class="mb-8 flex flex-col gap-4 sm:flex-row">
+            <a href="#ai-chat" class="inline-flex items-center justify-center rounded-2xl bg-smgBlue px-6 py-4 font-kanit text-base font-semibold text-white shadow-card transition hover:bg-smgBlue2">
+              เริ่มถาม AI เรื่องกระจก
+            </a>
+            <a href="https://line.me/R/ti/p/@smg58" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-smgGreen/40 px-6 py-4 font-kanit text-base font-semibold text-smgBlue transition hover:bg-smgMint">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="#6fa088"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+              LINE @smg58
+            </a>
+          </div>
+          <div class="flex gap-6 border-t border-smgBlue/10 pt-6">
+            <div><p class="font-kanit text-2xl font-extrabold text-smgBlue">20+</p><p class="text-xs text-slate-500">ปีประสบการณ์</p></div>
+            <div class="border-l border-smgBlue/10 pl-6"><p class="font-kanit text-2xl font-extrabold text-smgBlue">500+</p><p class="text-xs text-slate-500">โครงการที่ผ่านมา</p></div>
+            <div class="border-l border-smgBlue/10 pl-6"><p class="font-kanit text-2xl font-extrabold text-smgGreen">24/7</p><p class="text-xs text-slate-500">AI ตอบได้ตลอด</p></div>
+          </div>
+        </div>
+
+        <!-- Right: Glass Visual + AI Panel -->
+        <div id="ai-chat" class="flex flex-col">
+          <!-- Glass hero visual (CSS art — zero external deps) -->
+          <div class="glass-hero-visual flex-1">
+            <!-- Simulated glass panes -->
+            <div class="glass-pane" style="top:10%;left:5%;width:42%;height:38%;transform:skewY(-2deg);"></div>
+            <div class="glass-pane" style="top:8%;left:50%;width:44%;height:42%;transform:skewY(2deg);"></div>
+            <div class="glass-pane" style="top:52%;left:8%;width:38%;height:36%;transform:skewY(1deg);"></div>
+            <div class="glass-pane" style="top:54%;left:50%;width:42%;height:34%;transform:skewY(-1deg);"></div>
+            <!-- Shimmer line -->
+            <div style="position:absolute;top:0;left:30%;width:1px;height:100%;background:linear-gradient(to bottom,transparent,rgba(255,255,255,0.3) 40%,rgba(255,255,255,0.15) 60%,transparent);"></div>
+            <div style="position:absolute;top:0;left:65%;width:1px;height:100%;background:linear-gradient(to bottom,transparent,rgba(255,255,255,0.2) 50%,transparent);"></div>
+
+            <!-- Unsplash image layered on top — shows if loaded, CSS art shows if not -->
+            <img
+              src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=80&auto=format&fit=crop"
+              alt="งานกระจกสถาปัตยกรรม SMG"
+              style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
+              loading="lazy"
+              onerror="this.style.display='none'"
+            />
+            <div class="hero-img-overlay" style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,62,82,0.55) 0%,rgba(111,160,136,0.30) 100%);"></div>
+            <div class="glass-hero-content">
+              <p class="font-montserrat text-xs font-bold uppercase tracking-widest text-white/70 mb-2">Only The Significant</p>
+              <p class="font-kanit text-2xl font-bold text-white leading-snug">กระจกเทมเปอร์ · ลามิเนต<br/>อินซูเลท · งานติดตั้ง</p>
+            </div>
+          </div>
+
+          <!-- AI panel -->
+          <div class="bg-white/95 p-6 sm:p-8">
+            <div class="mb-4 flex items-start justify-between gap-3">
+              <h2 class="font-kanit text-xl font-bold text-smgBlue leading-snug">ถามเรื่องกระจกได้เลย<br/><span class="text-smgGreen">AI พร้อมช่วยคุณ</span></h2>
+              <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-smgBlue font-montserrat text-sm font-bold text-white shadow-card">AI</div>
+            </div>
+            <div class="mb-4 grid gap-2">
+              <a href="https://www.smg-con.co.th/contact.php" target="_blank" rel="noopener" class="question-card block rounded-xl border border-slate-200 bg-smgPale px-4 py-3 text-sm text-smgBlack transition-all hover:border-smgGreen hover:bg-smgMint">💬 ขอใบเสนอราคา ต้องเตรียมข้อมูลอะไรบ้าง?</a>
+              <a href="https://www.smg-con.co.th/product-detail.php?id=4" target="_blank" rel="noopener" class="question-card block rounded-xl border border-slate-200 bg-smgPale px-4 py-3 text-sm text-smgBlack transition-all hover:border-smgGreen hover:bg-smgMint">🔥 กระจกเทมเปอร์เหมาะกับงานแบบไหน?</a>
+              <a href="https://www.smg-con.co.th/product-detail.php?id=6" target="_blank" rel="noopener" class="question-card block rounded-xl border border-slate-200 bg-smgPale px-4 py-3 text-sm text-smgBlack transition-all hover:border-smgGreen hover:bg-smgMint">🌡️ กระจกอินซูเลทช่วยลดความร้อนได้อย่างไร?</a>
+              <a href="https://www.smg-con.co.th/product-detail.php?id=1" target="_blank" rel="noopener" class="question-card block rounded-xl border border-slate-200 bg-smgPale px-4 py-3 text-sm text-smgBlack transition-all hover:border-smgGreen hover:bg-smgMint">🔍 กระจกลามิเนตกับกระจกเทมเปอร์ต่างกันอย่างไร?</a>
+            </div>
+            <div class="mb-4 rounded-2xl bg-smgBlue p-5 text-white">
+              <h3 class="mb-2 font-kanit text-lg font-bold">ต้องการใบเสนอราคา?</h3>
+              <p class="text-xs text-white/70 mb-3">เตรียมข้อมูลเหล่านี้ให้พร้อม</p>
+              <ul class="space-y-1 text-sm text-white/90">
+                <li>• ประเภทกระจก</li>
+                <li>• ขนาด กว้าง × สูง (ซม.)</li>
+                <li>• จำนวนแผ่น</li>
+                <li>• สถานที่ติดตั้ง</li>
+                <li>• รูปภาพหน้างาน (ถ้ามี)</li>
+              </ul>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <a href="tel:0863174966" class="rounded-xl border border-smgBlue bg-white px-4 py-3 text-center font-kanit text-sm font-semibold text-smgBlue transition hover:bg-smgBlue hover:text-white">☎ โทรหา SMG</a>
+              <a href="https://line.me/R/ti/p/@smg58" target="_blank" rel="noopener" class="rounded-xl bg-smgGreen px-4 py-3 text-center font-kanit text-sm font-semibold text-white transition hover:bg-smgBlue">LINE @smg58</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Photo Strip (CSS art + Unsplash fallback) -->
+  <section class="mx-auto max-w-7xl px-4 pb-8 sm:px-8">
+    <div class="grid grid-cols-3 gap-3 sm:gap-4">
+
+      <div class="relative overflow-hidden rounded-2xl photo-strip-1" style="aspect-ratio:4/3;">
+        <div class="photo-grid-overlay"></div>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2rem;opacity:0.25;">🏢</div>
+        <img
+          src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&q=75&auto=format&fit=crop"
+          alt="กระจกกั้นห้องสำนักงาน"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
+          loading="lazy" onerror="this.style.display='none'"
+        />
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,62,82,0.7) 0%,transparent 50%);"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:0.75rem;">
+          <span class="font-kanit text-xs font-semibold text-white">กระจกกั้นห้อง</span>
+        </div>
+      </div>
+
+      <div class="relative overflow-hidden rounded-2xl photo-strip-2" style="aspect-ratio:4/3;">
+        <div class="photo-grid-overlay"></div>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2rem;opacity:0.25;">🪞</div>
+        <img
+          src="https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=600&q=75&auto=format&fit=crop"
+          alt="ราวกระจก บันได"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
+          loading="lazy" onerror="this.style.display='none'"
+        />
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,62,82,0.7) 0%,transparent 50%);"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:0.75rem;">
+          <span class="font-kanit text-xs font-semibold text-white">ราวกระจก</span>
+        </div>
+      </div>
+
+      <div class="relative overflow-hidden rounded-2xl photo-strip-3" style="aspect-ratio:4/3;">
+        <div class="photo-grid-overlay"></div>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2rem;opacity:0.25;">🏗️</div>
+        <img
+          src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=75&auto=format&fit=crop"
+          alt="ผนังกระจก อาคาร"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
+          loading="lazy" onerror="this.style.display='none'"
+        />
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,62,82,0.7) 0%,transparent 50%);"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:0.75rem;">
+          <span class="font-kanit text-xs font-semibold text-white">ผนังกระจก</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="mx-auto max-w-7xl px-4 pb-10 sm:px-8">
+    <div class="mb-9 text-center">
+      <p class="mb-3 font-montserrat text-xs font-bold uppercase tracking-[0.24em] text-smgGreen">Useful Links</p>
+      <h2 class="font-kanit text-3xl font-extrabold text-smgBlue sm:text-4xl">ทางลัดสำหรับเริ่มต้นงานกระจก</h2>
+    </div>
+    <div class="grid gap-5 md:grid-cols-3">
+
+      <a href="https://www.smg-con.co.th/service.php" target="_blank" rel="noopener" class="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-card transition hover:-translate-y-1 hover:border-smgGreen">
+        <div class="svc-img-fallback svc-img-1">
+          <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=70&auto=format&fit=crop" alt="บริการงานกระจก"
+            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'"/>
+          <span style="position:relative;z-index:1;font-size:2.5rem;">🏢</span>
+        </div>
+        <div class="p-7">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-smgBlue/10 font-montserrat text-base font-bold text-smgBlue">01</div>
+          <h3 class="mb-2 font-kanit text-xl font-bold text-smgBlue">บริการของ SMG</h3>
+          <p class="text-sm leading-7 text-slate-600">ออกแบบ ติดตั้ง และจัดจำหน่ายกระจกแปรรูปสำหรับบ้าน สำนักงาน และโครงการ</p>
+        </div>
+      </a>
+
+      <a href="https://www.smg-con.co.th/esg_center.php" target="_blank" rel="noopener" class="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-card transition hover:-translate-y-1 hover:border-smgGreen">
+        <div class="svc-img-fallback svc-img-2">
+          <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=600&q=70&auto=format&fit=crop" alt="ESG"
+            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'"/>
+          <span style="position:relative;z-index:1;font-size:2.5rem;">🌿</span>
+        </div>
+        <div class="p-7">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-smgGreen/15 font-montserrat text-base font-bold text-smgBlue">02</div>
+          <h3 class="mb-2 font-kanit text-xl font-bold text-smgBlue">ESG CENTER</h3>
+          <p class="text-sm leading-7 text-slate-600">บทความ ความรู้กระจก ความปลอดภัย และแนวคิด ESG สำหรับเลือกใช้งานที่เหมาะสม</p>
+        </div>
+      </a>
+
+      <a href="https://www.smg-con.co.th/contact.php" target="_blank" rel="noopener" class="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-card transition hover:-translate-y-1 hover:border-smgGreen">
+        <div class="svc-img-fallback svc-img-3">
+          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=70&auto=format&fit=crop" alt="ติดต่อ"
+            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'"/>
+          <span style="position:relative;z-index:1;font-size:2.5rem;">📞</span>
+        </div>
+        <div class="p-7">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-smgBlue/10 font-montserrat text-base font-bold text-smgBlue">03</div>
+          <h3 class="mb-2 font-kanit text-xl font-bold text-smgBlue">ติดต่อทีมงาน</h3>
+          <p class="text-sm leading-7 text-slate-600">ส่งข้อมูลโครงการ ขนาดกระจก รูปหน้างาน หรือสอบถามรายละเอียดกับทีมงาน SMG</p>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Ecosystem Section -->
+  <section class="mx-auto max-w-7xl px-4 pb-10 sm:px-8">
+    <div class="mb-8 text-center">
+      <p class="mb-3 font-montserrat text-xs font-bold uppercase tracking-[0.24em] text-smgGreen">SMG Digital Tools</p>
+      <h2 class="font-kanit text-3xl font-extrabold text-smgBlue sm:text-4xl">เครื่องมือออนไลน์ครบวงจร</h2>
+      <p class="mt-3 text-slate-500 text-sm">ทุกเครื่องมือพัฒนาโดย SMG เพื่อช่วยลูกค้า สถาปนิก และช่างทำงานได้ถูกต้องตั้งแต่ต้น</p>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-2xl border-2 border-smgGreen bg-smgMint p-5 relative overflow-hidden">
+        <div class="absolute top-3 right-3 rounded-full bg-smgGreen px-2 py-0.5 font-montserrat text-[0.6rem] font-bold uppercase text-white tracking-wider">คุณอยู่ที่นี่</div>
+        <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-smgBlue font-montserrat text-sm font-bold text-white">AI</div>
+        <h3 class="mb-1 font-kanit text-lg font-bold text-smgBlue">SMG AI Chat</h3>
+        <p class="text-xs leading-6 text-slate-600 mb-4">ถาม-ตอบเรื่องกระจก ขอราคาเบื้องต้น ปรึกษาโครงการ โดย AI 24/7</p>
+        <span class="inline-block rounded-lg bg-smgBlue px-3 py-1.5 text-xs font-semibold text-white">หน้านี้</span>
+      </div>
+      <a href="https://tong778-bot.github.io/smg-tools/" target="_blank" rel="noopener" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition hover:-translate-y-1 hover:border-smgGreen hover:bg-smgPale">
+        <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-smgBlue/10 font-montserrat text-lg font-bold text-smgBlue">📐</div>
+        <h3 class="mb-1 font-kanit text-lg font-bold text-smgBlue">Glass Calculator</h3>
+        <p class="text-xs leading-6 text-slate-600 mb-4">คำนวณสเปกกระจกกันความร้อน กันเสียง กระจกโค้ง สระว่ายน้ำ และ ESG Carbon</p>
+        <span class="inline-flex items-center gap-1 text-xs font-semibold text-smgGreen group-hover:gap-2 transition-all">เปิดเครื่องมือ →</span>
+      </a>
+      <a href="https://tong778-bot.github.io/smg-glass-pool/index.html" target="_blank" rel="noopener" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition hover:-translate-y-1 hover:border-smgGreen hover:bg-smgPale">
+        <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-smgBlue/10 font-montserrat text-lg font-bold text-smgBlue">🏊</div>
+        <h3 class="mb-1 font-kanit text-lg font-bold text-smgBlue">Glass Pool Series</h3>
+        <p class="text-xs leading-6 text-slate-600 mb-4">คู่มือสระว่ายน้ำกระจก 5 เล่ม 24 บท จากประสบการณ์หน้างาน 20 ปี อ่านฟรี</p>
+        <span class="inline-flex items-center gap-1 text-xs font-semibold text-smgGreen group-hover:gap-2 transition-all">อ่านคู่มือ →</span>
+      </a>
+      <a href="https://tong778-bot.github.io/smg-fairjoint/efiling-guide.html" target="_blank" rel="noopener" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition hover:-translate-y-1 hover:border-smgGreen hover:bg-smgPale">
+        <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-smgBlue/10 font-montserrat text-lg font-bold text-smgBlue">⚖️</div>
+        <h3 class="mb-1 font-kanit text-lg font-bold text-smgBlue">FairJoint</h3>
+        <p class="text-xs leading-6 text-slate-600 mb-4">สร้างสัญญาจ้างทำของมาตรฐานศาลแพ่ง ปกป้องทั้งเจ้าของบ้านและช่าง</p>
+        <span class="inline-flex items-center gap-1 text-xs font-semibold text-smgGreen group-hover:gap-2 transition-all">สร้างสัญญา →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-8">
+    <div class="brand-gradient overflow-hidden rounded-[2rem] p-7 text-white shadow-smg sm:p-10 relative">
+      <div class="absolute inset-0 opacity-10" style="background-image:linear-gradient(rgba(255,255,255,0.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.15) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p class="mb-2 font-montserrat text-xs font-semibold uppercase tracking-[0.24em] text-white/75">Only The Significant</p>
+          <h2 class="font-kanit text-3xl font-extrabold leading-tight sm:text-4xl">เริ่มต้นปรึกษางานกระจกกับ SMG</h2>
+          <p class="mt-3 max-w-2xl leading-8 text-white/85">ใช้หน้านี้เป็นประตูสำหรับ AI Chat, Google Business Profile และ LINE OA โดยแยกจากเว็บไซต์หลักเพื่อความปลอดภัยของระบบ</p>
+        </div>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <a href="tel:0863174966" class="rounded-2xl bg-white px-6 py-4 text-center font-kanit font-semibold text-smgBlue transition hover:bg-slate-100">☎ โทร 086-317-4966</a>
+          <a href="https://line.me/R/ti/p/@smg58" target="_blank" rel="noopener" class="rounded-2xl border border-white/25 bg-white/12 px-6 py-4 text-center font-kanit font-semibold text-white transition hover:bg-white/20">LINE @smg58</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Floating Buttons -->
+<div class="fixed bottom-5 right-5 z-50 flex flex-col gap-3">
+  <a href="https://line.me/R/ti/p/@smg58" target="_blank" rel="noopener" aria-label="LINE @smg58"
+     class="float-line flex h-14 w-14 items-center justify-center rounded-full text-white shadow-card transition">
+    <svg viewBox="0 0 24 24" class="h-7 w-7" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+  </a>
+  <a href="tel:0863174966" aria-label="โทร SMG"
+     class="flex h-14 w-14 items-center justify-center rounded-full bg-smgBlue text-white shadow-card transition hover:bg-smgBlue2">
+    <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+    </svg>
+  </a>
+</div>
+
+<!-- Footer -->
+<footer class="bg-smgBlack text-white">
+  <div class="mx-auto max-w-7xl px-4 py-10 sm:px-8">
+    <div class="grid gap-8 md:grid-cols-3">
+      <div>
+        <img src="./logo_3_deepblue.png" alt="SMG Glass and Metal" class="mb-5 h-16 w-auto rounded-xl bg-smgBlue object-contain p-2" loading="lazy"/>
+        <p class="font-montserrat text-lg font-bold">SMG Glass And Metal Co., Ltd.</p>
+        <p class="mb-4 mt-1 font-montserrat text-xs uppercase tracking-[0.24em] text-white/55">Only The Significant</p>
+        <p class="max-w-xs leading-7 text-white/60 text-sm">24/22 ซอยกำนันแม้น 13 แยก 18 แขวงบางบอน เขตบางบอน กรุงเทพฯ 10150</p>
+      </div>
+      <div>
+        <p class="mb-4 font-montserrat text-xs font-bold uppercase tracking-wider text-white/40">ติดต่อ</p>
+        <p class="mb-2 text-sm text-white/75">โทร: 086-317-4966, 094-663-9951</p>
+        <p class="mb-2 text-sm text-white/75">LINE ID: @smg58</p>
+        <p class="mb-2 text-sm text-white/75">เว็บไซต์: www.smg-con.co.th</p>
+        <p class="text-sm text-white/75">อีเมล: smg58.glass@gmail.com</p>
+      </div>
+      <div>
+        <p class="mb-4 font-montserrat text-xs font-bold uppercase tracking-wider text-white/40">SMG Digital Tools</p>
+        <ul class="space-y-2">
+          <li><a href="https://tong778-bot.github.io/smg-ai-chat/" class="text-sm text-smgGreen hover:text-white transition">AI Chat Assistant</a></li>
+          <li><a href="https://tong778-bot.github.io/smg-tools/" target="_blank" rel="noopener" class="text-sm text-white/60 hover:text-white transition">Glass Calculator Tools</a></li>
+          <li><a href="https://tong778-bot.github.io/smg-glass-pool/index.html" target="_blank" rel="noopener" class="text-sm text-white/60 hover:text-white transition">Glass Pool Series</a></li>
+          <li><a href="https://tong778-bot.github.io/smg-fairjoint/efiling-guide.html" target="_blank" rel="noopener" class="text-sm text-white/60 hover:text-white transition">FairJoint — สัญญามาตรฐาน</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-8 flex flex-col justify-between gap-3 border-t border-white/10 pt-5 text-xs text-white/35 sm:flex-row">
+      <p>© 2026 SMG Glass And Metal. All rights reserved.</p>
+      <p>AI Assistant Landing Page</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Chatbase Widget -->
+<script>
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="3o8DmaJIAFg4dcj1vOjjz";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
+
+</body>
+</html>
